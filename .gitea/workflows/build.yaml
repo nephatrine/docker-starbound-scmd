@@ -45,12 +45,6 @@ jobs:
         run: |
           docker tag code.nephatrine.net/nephnet/starbound-scmd:master nephatrine/starbound-scmd:latest
           docker push nephatrine/starbound-scmd:latest
-      - name: Docker Describe
-        uses: actions/dockerhub-update-description@v3
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
-          repository: nephatrine/starbound-scmd
       - name: Notify Discord
         if: github.event_name == 'push' || steps.checkbase.outputs.needs-updating == 'true'
         uses: actions/discord-status@v1
@@ -59,3 +53,11 @@ jobs:
           description: "The container image was pushed to [DockerHub](https://hub.docker.com/repository/docker/nephatrine/starbound-scmd/general).\nPull `nephatrine/starbound-scmd:latest` for the newest image."
           nodetail: true
           webhook: ${{ secrets.DISCORD_WEBHOOK_PACKAGE }}
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Docker Describe
+        uses: actions/dockerhub-update-description@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+          repository: nephatrine/starbound-scmd
