@@ -1,0 +1,61 @@
+name: Build Container Image
+run-name: ${{ gitea.actor }} pushed to ${{ gitea.repository }}:${{ gitea.ref_name }}
+on: [push, workflow_call]
+jobs:
+  build_amd64:
+    if: gitea.repository_owner == 'NephNET' && !contains(github.event.head_commit.message, '#noci')
+    runs-on: nephnet-amd64
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Docker Build
+        run: docker build --pull -t code.nephatrine.net/nephnet/starbound-scmd:${{ gitea.ref_name }} ${{ gitea.workspace }}
+      - name: Docker Login
+        uses: actions/docker-login@v2
+        with:
+          registry: code.nephatrine.net
+          username: ${{ gitea.actor }}
+          password: ${{ secrets.PACKAGER_TOKEN }}
+      - name: Docker Push
+        run: docker push code.nephatrine.net/nephnet/starbound-scmd:${{ gitea.ref_name }}
+      - name: Notify Discord
+        uses: actions/discord-status@v1
+        if: always()
+        with:
+          title: "Container Build (X86_64)"
+          webhook: ${{ secrets.DISCORD_WEBHOOK_BUILD }}
+  publish_amd64:
+    if: gitea.ref_name == 'master'
+    needs: [build_amd64]
+    runs-on: nephnet-amd64
+    steps:
+      - name: Check Base Image
+        if: github.event_name != 'push'
+        uses: actions/docker-base-image-check@v1.2.1
+        id: checkbase
+        with:
+          base-image: cm2network/steamcmd:root
+          image: nephatrine/starbound-scmd:latest
+      - name: Docker Login
+        uses: actions/docker-login@v2
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+      - name: Docker Push
+        run: |
+          docker tag code.nephatrine.net/nephnet/starbound-scmd:master nephatrine/starbound-scmd:latest
+          docker push nephatrine/starbound-scmd:latest
+      - name: Docker Describe
+        uses: actions/dockerhub-update-description@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+          repository: nephatrine/starbound-scmd
+      - name: Notify Discord
+        if: github.event_name == 'push' || steps.checkbase.outputs.needs-updating == 'true'
+        uses: actions/discord-status@v1
+        with:
+          title: "DockerHub: drone-ci"
+          description: "The container image was pushed to [DockerHub](https://hub.docker.com/repository/docker/nephatrine/starbound-scmd/general).\nPull `nephatrine/starbound-scmd:latest` for the newest image."
+          nodetail: true
+          webhook: ${{ secrets.DISCORD_WEBHOOK_PACKAGE }}
