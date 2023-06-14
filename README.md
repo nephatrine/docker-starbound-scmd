@@ -20,7 +20,7 @@ console and running `starbound-install.sh`. This will install/update Starbound
 and interactively have you log in. Any mods listed in the `workshop.txt` file
 in the game directory will be installed at this time as well.
 
-Alternatively, you can manually copy of the Linux game files and create a
+Alternatively, you can manually copy over the Linux game files and create a
 `.ready` file in the game directory.
 
 ## Persistent Mounts
@@ -48,3 +48,4 @@ the container. You can map these to host ports using the ``-p HOST:CONTAINER``
 or ``-p HOST:CONTAINER/PROTOCOL`` syntax.
 
 - ``21025/tcp``: Game Server.
+- ``21026/udp``: RCon Port.
