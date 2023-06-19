@@ -7,4 +7,4 @@ services:
       - "21025:21025/udp"
       - "21026:21026/tcp"
     volumes:
-      - /mnt/starbound-dedicated:/opt/starbound-dedicated
+      - /mnt/containers/starbound:/opt/starbound-dedicated

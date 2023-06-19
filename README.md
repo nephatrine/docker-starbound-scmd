@@ -6,6 +6,8 @@
 
 This docker image contains a Starbound server to self-host your own game.
 
+## Docker-Compose
+
 This is an example docker-compose file:
 
 ```yaml
@@ -18,45 +20,31 @@ services:
       - "21025:21025/udp"
       - "21026:21026/tcp"
     volumes:
-      - /mnt/starbound-scmd:/opt/starbound-dedicated
-
+      - /mnt/containers/starbound:/opt/starbound-dedicated
 ```
 
+## Game Installation w/ SteamCMD
+
 The installation uses **SteamCMD** and so will need your Steam credentials and
-SteamGuard 2FA. Due to this, it cannot be automated. On startup, if not
-installed yet the startup script will sleep in a loop waiting for the
-installation. You can perform the installation by going into the container
-console and running `starbound-install.sh`. This will install/update Starbound
-and interactively have you log in. Any mods listed in the `workshop.txt` file
-in the game directory will be installed at this time as well.
+SteamGuard 2FA. Due to this, it cannot be automated. On initial startup, it
+will sleep in a loop waiting for the installation.
 
-Alternatively, you can manually copy over the Linux game files and create a
-`.ready` file in the game directory.
+You can enter the container's terminal and run the `starbound-install.sh`
+script. This script takes one argument - your Steam username. It will query you
+for your Steam password and 2FA login to begin the installation or update
+process. Once this is complete, the game server will be automatically started.
 
-## Persistent Mounts
+## Steam Workshop Mods
 
-You can provide a persistent mountpoint using the ``-v /host/path:/container/path``
-syntax. These mountpoints are intended to house important configuration files,
-logs, and application state (e.g. databases) so they are not lost on image
-update.
+Steam Workshop mod IDs can be listed in a `workshop.txt` file in the root of
+the game directory. If it exists, the installation script will also download
+and install those. If the game is already installed and you just wish to
+install the mods listed there, you can run `starbound-install-workshop.sh`
+instead. Mod uninstallation must be done manually by removing the symlink in
+the mods folder.
 
-- ``/opt/starbound-dedicated``: Steam Game Data.
+## Server Configuration
 
-You can perform some basic configuration of the container using the files and
-directories listed below.
-
-- ``/opt/starbound-dedicated/storage/starbound_server.config``: Server Configuration [*]
-- ``/opt/starbound-dedicated/workshop.txt``: List Of Steam Workshop IDs
-
-**[*] Changes to some configuration files may require service restart to take
-immediate effect.**
-
-## Network Services
-
-This container runs network services that are intended to be exposed outside
-the container. You can map these to host ports using the ``-p HOST:CONTAINER``
-or ``-p HOST:CONTAINER/PROTOCOL`` syntax.
-
-- ``21025/tcp``: Game Server.
-- ``21025/udp``: Query Server.
-- ``21026/tcp``: RCon Server.
+Once the game has been installed and started for the first time, a
+`starbound_server.config` file will be created where you can configure the
+particulars for your server.
