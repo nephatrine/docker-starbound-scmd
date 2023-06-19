@@ -6,11 +6,21 @@
 
 This docker image contains a Starbound server to self-host your own game.
 
-You can spin up a quick temporary test container like this:
+This is an example docker-compose file:
 
-~~~
-docker run --rm -p 21025:21025 -it nephatrine/starbound-scmd:latest /bin/bash
-~~~
+```yaml
+services:
+  starbound:
+    image: nephatrine/starbound-scmd:latest
+    container_name: starbound
+    ports:
+      - "21025:21025/tcp"
+      - "21025:21025/udp"
+      - "21026:21026/tcp"
+    volumes:
+      - /mnt/starbound-scmd:/opt/starbound-dedicated
+
+```
 
 The installation uses **SteamCMD** and so will need your Steam credentials and
 SteamGuard 2FA. Due to this, it cannot be automated. On startup, if not
@@ -48,4 +58,5 @@ the container. You can map these to host ports using the ``-p HOST:CONTAINER``
 or ``-p HOST:CONTAINER/PROTOCOL`` syntax.
 
 - ``21025/tcp``: Game Server.
-- ``21026/udp``: RCon Port.
+- ``21025/udp``: Query Server.
+- ``21026/tcp``: RCon Server.

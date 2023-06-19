@@ -15,4 +15,4 @@ USER ${USER}
 WORKDIR ${HOMEDIR}
 CMD ["/usr/local/bin/starbound.sh"]
 
-EXPOSE 21025/tcp 21026/udp 21027/udp
+EXPOSE 21025/tcp 21025/udp 21026/tcp
