@@ -2,7 +2,7 @@
 [Docker](https://hub.docker.com/r/nephatrine/starbound-scmd/) |
 [unRAID](https://code.nephatrine.net/nephatrine/unraid-containers)
 
-# Starbound Server
+# Starbound Dedicated Game Server
 
 This docker image contains a Starbound server to self-host your own game.
 
